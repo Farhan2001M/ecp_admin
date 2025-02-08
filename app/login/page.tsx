@@ -1,3 +1,40 @@
+// "use client";
+
+// import { useState } from "react";
+// import { useRouter } from "next/navigation";
+// import { FaEye , FaEyeSlash } from "react-icons/fa";
+
+// export default function Login() {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [error, setError] = useState("");
+//   const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
+//   const router = useRouter();
+
+//   const handleSubmit = async (e:any) => {
+//     e.preventDefault();
+
+//     try {
+//       const res = await fetch("http://localhost:5000/api/auth", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ email, password }),
+//       });
+
+//       const data = await res.json();
+
+//       if (res.ok) {
+//         localStorage.setItem("token", data.token); // Store token
+//         router.push("/dashboard"); // Redirect to dashboard
+//       } else {
+//         setError(data.message);
+//       }
+//     } catch (err) {
+//       setError("Something went wrong");
+//     }
+//   };
+
+
 "use client";
 
 import { useState } from "react";

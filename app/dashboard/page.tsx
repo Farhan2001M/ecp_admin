@@ -1,35 +1,16 @@
+// app/page.tsx
+import React from "react";
+import Layout from "../components/Layout";
 
-// import React from 'react';
-// import CreateCategory from '../components/NewCategory';
-
-// const page = () => {
-//   return (
-//     <div className="p-6">
-//       <div className="mx-auto">
-//         <h1 className="text-2xl font-bold text-center">Dashboard</h1>
-//         <CreateCategory />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default page;
-
-import React from 'react';
-import CreateCategory from '../components/NewCategory';
-
-const page = () => {
+const Dashboard: React.FC = () => {
   return (
-    <div className="p-6">
-      <div className="mx-auto">
-        <h1 className="text-2xl font-bold text-center">Dashboard</h1>
-        <CreateCategory />
-      </div>
-    </div>
+    <Layout>
+      <h1 className="text-2xl font-bold text-center">Dashboard</h1>
+    </Layout>
   );
 };
 
-export default page;
+export default Dashboard;
 
 
 // import ClientTable from "./table"; 

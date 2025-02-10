@@ -1,4 +1,4 @@
-
+// NewCategory Component
 'use client'
 
 import { useState } from 'react'
@@ -8,6 +8,7 @@ import { DndContext, DragEndEvent } from '@dnd-kit/core'
 import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { RxCrossCircled } from "react-icons/rx";
+import { useCategoryStore } from "../stores/useCategoryStore";
 
 export default function CreateCategory() {
   const [isOpen, setIsOpen] = useState(false)
@@ -122,18 +123,15 @@ export default function CreateCategory() {
   // Submit category to MongoDB (via backend API)
   const createCategory = async () => {
     try {
-      // Trim the category name to remove leading and trailing spaces
-      let trimmedCategoryName = categoryName.trim();
-      // Replace multiple spaces between words with a single space
-      trimmedCategoryName = trimmedCategoryName.replace(/\s+/g, ' ');
+      let trimmedCategoryName = categoryName.trim().replace(/\s+/g, ' ');
       if (!trimmedCategoryName) return;
       const response = await fetch('http://localhost:5000/api/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: trimmedCategoryName, servings: servingSizes })
       });
-  
       if (response.ok) {
+        useCategoryStore.getState().triggerRefresh(); // ✅ Ensure fetch is triggered
         alert('Category created successfully!');
         setIsOpen(false);
         resetForm();

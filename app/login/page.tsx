@@ -1,39 +1,3 @@
-// "use client";
-
-// import { useState } from "react";
-// import { useRouter } from "next/navigation";
-// import { FaEye , FaEyeSlash } from "react-icons/fa";
-
-// export default function Login() {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [error, setError] = useState("");
-//   const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
-//   const router = useRouter();
-
-//   const handleSubmit = async (e:any) => {
-//     e.preventDefault();
-
-//     try {
-//       const res = await fetch("http://localhost:5000/api/auth", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ email, password }),
-//       });
-
-//       const data = await res.json();
-
-//       if (res.ok) {
-//         localStorage.setItem("token", data.token); // Store token
-//         router.push("/dashboard"); // Redirect to dashboard
-//       } else {
-//         setError(data.message);
-//       }
-//     } catch (err) {
-//       setError("Something went wrong");
-//     }
-//   };
-
 
 "use client";
 
@@ -45,7 +9,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
+  const [showPassword, setShowPassword] = useState(false); 
   const router = useRouter();
 
   const handleSubmit = async (e:any) => {
@@ -75,11 +39,7 @@ export default function Login() {
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            alt="Your Company"
-            src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-            className="mx-auto h-10 w-auto"
-          />
+          
           <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
             Sign in to your account
           </h2>

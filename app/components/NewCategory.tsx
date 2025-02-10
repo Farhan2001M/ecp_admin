@@ -11,6 +11,7 @@ import { RxCrossCircled } from "react-icons/rx";
 import { useCategoryStore } from "../stores/useCategoryStore";
 
 export default function CreateCategory() {
+
   const [isOpen, setIsOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [categoryName, setCategoryName] = useState('')
@@ -19,7 +20,8 @@ export default function CreateCategory() {
   const [selectedServingIndex, setSelectedServingIndex] = useState<number | null>(null)
   const [selectedServingName, setSelectedServingName] = useState<string | null>(null);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false) 
-  
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
   const resetForm = () => {
     setCategoryName('')
     setServingSizes([])
@@ -125,22 +127,29 @@ export default function CreateCategory() {
     try {
       let trimmedCategoryName = categoryName.trim().replace(/\s+/g, ' ');
       if (!trimmedCategoryName) return;
+      
       const response = await fetch('http://localhost:5000/api/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: trimmedCategoryName, servings: servingSizes })
       });
+      
       if (response.ok) {
-        useCategoryStore.getState().triggerRefresh(); // ✅ Ensure fetch is triggered
-        alert('Category created successfully!');
+        useCategoryStore.getState().triggerRefresh();
+        console.log('Category created:', trimmedCategoryName); // Log instead of alert
         setIsOpen(false);
+        setIsConfirmModalOpen(false);
         resetForm();
       } else {
         throw new Error('Failed to create category');
       }
     } catch (error) {
-      console.error(error);
-      alert('Error creating category');
+      if (error instanceof Error) {
+        console.error(error);
+        console.log('Error creating category:', error.message);
+      } else {
+        console.error('An unknown error occurred:', error);
+      }
     }
   };
   
@@ -269,14 +278,47 @@ export default function CreateCategory() {
             {/* Create Category Button */}
             <div className="mt-6 text-center">
               <button
-                onClick={createCategory}
+                onClick={() => setIsConfirmModalOpen(true)}
                 disabled={!categoryName.trim() || servingSizes.length === 0 || newServing.trim() !== ''}
                 className={`px-4 py-2 text-white rounded-lg shadow ${
                   !categoryName.trim() || servingSizes.length === 0 || newServing.trim() !== ''
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-indigo-600 hover:bg-indigo-500'
-                }`} >
+                }`}
+              >
                 Create Category
+              </button>
+            </div>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Confirmation Modal */}
+      <Dialog 
+        open={isConfirmModalOpen} 
+        onClose={() => setIsConfirmModalOpen(false)} 
+        className="relative z-[100]"
+      >
+        <div className="fixed inset-0 bg-black/30" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full">
+            <Dialog.Title className="text-lg font-semibold mb-2">
+              Confirm Category Creation
+            </Dialog.Title>
+            <p className="mb-4">Are you sure you want to create this category?</p>
+            
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                onClick={() => setIsConfirmModalOpen(false)}
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={createCategory}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
+              >
+                Confirm
               </button>
             </div>
           </div>

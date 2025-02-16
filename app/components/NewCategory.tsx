@@ -202,12 +202,9 @@ export default function CreateCategory() {
 
   return (
     <div className="">
-      <button
-        onClick={() => setIsOpen(true)}
-        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-500 flex items-center gap-2"
-      >
+      <button onClick={() => setIsOpen(true)} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-500 flex items-center gap-2" >
         <FaPlusCircle />
-        Create a New Category
+        ADD Category
       </button>
 
       {/* Modal for category creation */}
@@ -217,10 +214,7 @@ export default function CreateCategory() {
           <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
             
             {/* Close (X) Button */}
-            <button
-              onClick={closeCreateCategoryModal}
-              className="absolute right-3 top-3 rounded-md text-gray-400 hover:text-gray-600 focus:outline-none"
-            >
+            <button onClick={closeCreateCategoryModal} className="absolute right-3 top-3 rounded-md text-gray-400 hover:text-gray-600 focus:outline-none" >
               <RxCrossCircled className="w-6 h-6" />
             </button>
 
@@ -231,31 +225,15 @@ export default function CreateCategory() {
             {/* Category Name Input */}
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700">Category Name</label>
-              <input
-                type="text"
-                value={categoryName}
-                onChange={handleCategoryNameChange}
-                className="w-full mt-1 p-2 border rounded-lg"
-                placeholder="Enter category name"
-              />
+              <input type="text" value={categoryName} onChange={handleCategoryNameChange} className="w-full mt-1 p-2 border rounded-lg" placeholder="Enter category name" />
             </div>
 
             {/* Serving Size Input */}
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700">Serving Sizes</label>
               <div className="flex gap-2 mt-1">
-                <input
-                  type="text"
-                  value={newServing}
-                  onChange={handleServingInputChange}
-                  className="flex-1 p-2 border rounded-lg"
-                  placeholder="e.g., Small, Medium, Large"
-                />
-                <button
-                  onClick={addServingSize}
-                  disabled={!newServing.trim()} 
-                  className={`px-4 py-2 rounded-lg shadow ${!newServing.trim() ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-500'}`}
-                >
+                <input type="text" value={newServing} onChange={handleServingInputChange} className="flex-1 p-2 border rounded-lg" placeholder="e.g., Small, Medium, Large or Standard" />
+                <button onClick={addServingSize} disabled={!newServing.trim()}  className={`px-4 py-2 rounded-lg shadow ${!newServing.trim() ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-500'}`} >
                   Add
                 </button>
               </div>
@@ -264,10 +242,7 @@ export default function CreateCategory() {
             {/* List of Serving Sizes with scroll */}
             <div className="mt-3 max-h-40 overflow-y-auto overflow-x-hidden space-y-2">
               <DndContext onDragEnd={handleDragEnd}>
-                <SortableContext
-                  items={servingSizes}
-                  strategy={verticalListSortingStrategy}
-                >
+                <SortableContext items={servingSizes} strategy={verticalListSortingStrategy} >
                   {servingSizes.map((size, index) => (
                     <DraggableServing key={size} size={size} index={index} />
                   ))}
@@ -306,20 +281,9 @@ export default function CreateCategory() {
               Confirm Category Creation
             </Dialog.Title>
             <p className="mb-4">Are you sure you want to create this category?</p>
-            
             <div className="mt-4 flex justify-end gap-3">
-              <button
-                onClick={() => setIsConfirmModalOpen(false)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={createCategory}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
-              >
-                Confirm
-              </button>
+              <button onClick={() => setIsConfirmModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded" > Cancel </button>
+              <button onClick={createCategory} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500" > Confirm </button>
             </div>
           </div>
         </div>
@@ -334,23 +298,12 @@ export default function CreateCategory() {
               Are you sure you want to delete this "{selectedServingName}" serrving size ?
             </Dialog.Title>
             <div className="mt-6 flex justify-around">
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg"
-              >
-                Delete
-              </button>
-              <button
-                onClick={cancelDelete}
-                className="px-4 py-2 bg-gray-400 text-white rounded-lg"
-              >
-                Cancel
-              </button>
+              <button onClick={confirmDelete} className="px-4 py-2 bg-red-600 text-white rounded-lg" > Delete </button>
+              <button onClick={cancelDelete} className="px-4 py-2 bg-gray-400 text-white rounded-lg" > Cancel </button>
             </div>
           </div>
         </div>
       </Dialog>
-
 
       {/* Cancel Confirmation Modal */}
       <Dialog open={isCancelModalOpen} onClose={cancelCloseModal} className="relative z-10">
@@ -363,18 +316,8 @@ export default function CreateCategory() {
             <p className="text-center text-gray-600 mt-2">All your filled details will be lost.</p>
 
             <div className="mt-6 flex justify-around">
-              <button
-                onClick={confirmCloseModal}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg"
-              >
-                Confirm
-              </button>
-              <button
-                onClick={cancelCloseModal}
-                className="px-4 py-2 bg-gray-400 text-white rounded-lg"
-              >
-                Cancel
-              </button>
+              <button onClick={confirmCloseModal} className="px-4 py-2 bg-red-600 text-white rounded-lg" > Confirm </button>
+              <button onClick={cancelCloseModal} className="px-4 py-2 bg-gray-400 text-white rounded-lg" >  Cancel </button>
             </div>
           </div>
         </div>

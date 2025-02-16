@@ -8,6 +8,7 @@ import { Category } from "../types/interfaces";
 import EditCategory from "./EditCategory";
 import DeleteCategory from "./DeleteCategory";
 
+
 const CategoryTable: React.FC = () => {
   const { categories } = useCategoryStore();
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -37,6 +38,7 @@ const CategoryTable: React.FC = () => {
               <th className="py-3 px-3 text-sm font-semibold text-gray-900">Name</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Servings</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Servings Count</th>
+              <th className="px-3 py-3 text-sm font-semibold text-gray-900">Product Count</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Status</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Highlighted</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Actions</th>
@@ -48,6 +50,7 @@ const CategoryTable: React.FC = () => {
                 <td className="py-4 px-3 text-sm text-gray-900">{category.name}</td>
                 <td className="px-3 py-4 text-sm text-gray-500">{category.servings.join(", ")}</td>
                 <td className="px-3 py-4 text-sm text-gray-500">{category.servingsCount}</td>
+                <td className="px-3 py-4 text-sm text-gray-500">{category.productCount}</td>
                 <td className="px-3 py-4 text-sm">
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${category.isactive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                     {category.isactive ? "Active" : "Inactive"}

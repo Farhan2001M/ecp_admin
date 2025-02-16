@@ -16,7 +16,9 @@ const Categories: React.FC = () => {
   return (
     <Layout>
       <h1 className="text-2xl font-bold text-center">Categories</h1>
-      <CreateCategory />
+      <div className="flex justify-end ">
+        <CreateCategory />
+      </div>
       <CategoryTable />
     </Layout>
   );

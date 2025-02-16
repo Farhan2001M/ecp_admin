@@ -4,10 +4,7 @@ import React from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Selection, ChipProps, SortDescriptor, } from "@heroui/react";
 import { SearchIcon, ChevronDownIcon, PlusIcon, VerticalDotsIcon } from "../dashboard/icons";
 import { users } from "./users"; // Import users from users.ts
-
-export function capitalize(s: string) {
-  return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
-}
+import { capitalize } from "../utils/helperFunctions";
 
 
 export const columns = [

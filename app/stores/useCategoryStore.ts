@@ -11,7 +11,7 @@ interface CategoryStore {
   removeCategory: (id: string) => void;
 }
 
-export const useCategoryStore = create<CategoryStore>((set) => ({
+export const useCategoryStore = create<CategoryStore>((set ) => ({
   categories: [],
   refreshTrigger: 0, // ✅ Initial value
 

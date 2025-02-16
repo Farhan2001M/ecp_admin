@@ -8,7 +8,6 @@ import { Category } from "../types/interfaces";
 import EditCategory from "./EditCategory";
 import DeleteCategory from "./DeleteCategory";
 
-
 const CategoryTable: React.FC = () => {
   const { categories } = useCategoryStore();
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);

@@ -226,57 +226,53 @@ export default function EditCategory({ category, onClose }: EditCategoryProps) {
           </div>
 
           <div className="mt-4 flex items-center justify-center gap-6">
-  {/* Status Section */}
-  <div className="flex items-center gap-2">
-    <span className="text-sm font-medium text-gray-700">Status:</span>
-    <span className="text-sm font-semibold text-gray-900 min-w-[60px] text-center">
-      {isActive ? 'Active' : 'Inactive'}
-    </span>
-    <Switch
-      checked={isActive}
-      onChange={setIsActive}
-      className={`group relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${
-        isActive ? 'bg-blue-600' : 'bg-gray-200'
-      }`}
-    >
-      <span className="sr-only">Toggle Status</span>
-      <span
-        className={`pointer-events-none relative inline-block size-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-          isActive ? 'translate-x-5' : 'translate-x-0'
-        }`}
-      />
-    </Switch>
-  </div>
+            {/* Status Section */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Status:</span>
+              <span className="text-sm font-semibold text-gray-900 min-w-[60px] text-center">
+                {isActive ? 'Active' : 'Inactive'}
+              </span>
+              <Switch
+                checked={isActive}
+                onChange={setIsActive}
+                className={`group relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${
+                  isActive ? 'bg-blue-600' : 'bg-gray-200'
+                }`}
+              >
+                <span className="sr-only">Toggle Status</span>
+                <span
+                  className={`pointer-events-none relative inline-block size-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    isActive ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </Switch>
+            </div>
 
-  {/* Fixed Separator (Centered) */}
-  <div className="text-gray-400 font-bold text-lg flex-shrink-0">|</div>
+            {/* Fixed Separator (Centered) */}
+            <div className="text-gray-400 font-bold text-lg flex-shrink-0">|</div>
 
-  {/* Highlighted Section */}
-  <div className="flex items-center gap-2">
-    <span className="text-sm font-medium text-gray-700">Highlighted:</span>
-    <span className="text-sm font-semibold text-gray-900 min-w-[40px] text-center">
-      {isHighlighted ? 'Yes' : 'No'}
-    </span>
-    <Switch
-      checked={isHighlighted}
-      onChange={setIsHighlighted}
-      className={`group relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 ${
-        isHighlighted ? 'bg-yellow-400' : 'bg-gray-200'
-      }`}
-    >
-      <span className="sr-only">Toggle Highlighted</span>
-      <span
-        className={`pointer-events-none relative inline-block size-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-          isHighlighted ? 'translate-x-5' : 'translate-x-0'
-        }`}
-      />
-    </Switch>
-  </div>
-</div>
-
-
-
-
+            {/* Highlighted Section */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Highlighted:</span>
+              <span className="text-sm font-semibold text-gray-900 min-w-[40px] text-center">
+                {isHighlighted ? 'Yes' : 'No'}
+              </span>
+              <Switch
+                checked={isHighlighted}
+                onChange={setIsHighlighted}
+                className={`group relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 ${
+                  isHighlighted ? 'bg-yellow-400' : 'bg-gray-200'
+                }`}
+              >
+                <span className="sr-only">Toggle Highlighted</span>
+                <span
+                  className={`pointer-events-none relative inline-block size-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    isHighlighted ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </Switch>
+            </div>
+          </div>
 
           <div className="mt-6 text-center">
             <button

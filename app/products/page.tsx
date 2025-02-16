@@ -3,15 +3,15 @@
 import React, { useEffect } from "react";
 import Layout from "../components/Layout";
 import CreateProduct from "../components/NewProduct";
-// import ProductsTable from "../components/ProductsTable";
-import { useCategoryStore } from "../stores/useCategoryStore";
+import ProductsTable from "../components/ProductsTable";
+import { useProductStore } from "../stores/useProductStore";
 
 const Categories: React.FC = () => {
-  const { fetchCategories, refreshTrigger } = useCategoryStore();
+  const { fetchProducts, refreshTrigger } = useProductStore();
 
   useEffect(() => {
-    fetchCategories(); // ✅ Fetch when refreshTrigger changes
-  }, [fetchCategories, refreshTrigger]);
+    fetchProducts(); // ✅ Fetch when refreshTrigger changes
+  }, [fetchProducts, refreshTrigger]);
 
   return (
     <Layout>
@@ -19,7 +19,7 @@ const Categories: React.FC = () => {
       <div className="flex justify-end ">
         <CreateProduct />
       </div>
-      {/* <ProductsTable /> */}
+      <ProductsTable />
     </Layout>
   );
 };

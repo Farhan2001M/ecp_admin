@@ -28,12 +28,14 @@ const ProductTable: React.FC = () => {
             <tr>
               <th className="py-3 px-3 text-sm font-semibold text-gray-900">Name</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Brand</th>
-              {/* <th className="px-3 py-3 text-sm font-semibold text-gray-900">Category</th>  */}
+              <th className="px-3 py-3 text-sm font-semibold text-gray-900">Category</th> 
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Price</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Stock</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">In Stock</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Rating</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Dimensions</th>
+              <th className="px-3 py-3 text-sm font-semibold text-gray-900">Images</th>
+              <th className="px-3 py-3 text-sm font-semibold text-gray-900">Videos</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Actions</th>
             </tr>
           </thead>
@@ -41,9 +43,24 @@ const ProductTable: React.FC = () => {
             {products.length > 0 ? (
               products.map((product) => (
                 <tr key={product._id} className="border-b bg-white">
-                  <td className="py-4 px-3 text-sm text-gray-900">{product.name}</td>
+                  <td className="py-4 px-3 text-sm text-gray-900 flex items-center space-x-3">
+                    {product.images.length > 0 ? (
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="w-10 h-10 object-cover rounded-md border border-black"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                        <span className="text-xs text-gray-500">No Img</span>
+                      </div>
+                    )}
+                    <span>{product.name}</span>
+                  </td>
                   <td className="px-3 py-4 text-sm text-gray-500">{product.brand}</td>
-                  {/* <td className="px-3 py-4 text-sm text-gray-500">{product.categoryID}</td> */}
+                  <td className="px-3 py-4 text-sm text-gray-500">
+                    {typeof product.categoryID === "object" ? product.categoryID.name : "Unknown"}
+                  </td>
                   <td className="px-3 py-4 text-sm text-gray-500">${product.price.toFixed(2)}</td>
                   <td className="px-3 py-4 text-sm text-gray-500">{product.totalStock}</td>
                   <td className="px-3 py-4 text-sm">
@@ -53,7 +70,9 @@ const ProductTable: React.FC = () => {
                   </td>
                   <td className="px-3 py-4 text-sm text-gray-500">{product.ratings}</td>
                   <td className="px-3 py-4 text-sm text-gray-500">{product.dimensions}</td>
-                  <td className="px-3 py-4 text-sm flex space-x-4">
+                  <td className="px-3 py-4 text-sm text-gray-500">{product.images.length}</td>
+                  <td className="px-3 py-4 text-sm text-gray-500">{product.videos.length}</td>
+                  <td className="px-3 py-4 text-sm flex space-x-2">
                     <button onClick={() => setEditingProduct(product)} className="text-indigo-600 hover:text-indigo-900">
                       <FaEdit className="w-5 h-5" />
                     </button>

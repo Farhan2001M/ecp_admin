@@ -8,13 +8,11 @@ export interface Category {
   highlighted: boolean;
 }
 
-
-
 export interface Product {
   _id: string;
   name: string;
   brand: string;
-  categoryID: string;
+  categoryID: { _id: string; name: string } | string;  // Allow both cases
   price: number;
   description: string;
   totalStock: number;
@@ -23,4 +21,4 @@ export interface Product {
   inStock: boolean; 
   ratings: number;
   dimensions: string;
-}
+} 

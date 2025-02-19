@@ -1,16 +1,17 @@
 // CreateProduct Component
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Dialog } from '@headlessui/react'
 import { FaPlusCircle, FaTimes } from 'react-icons/fa'
 import { RxCrossCircled } from "react-icons/rx";
 import { useCategoryStore } from "../stores/useCategoryStore";
 import { IoIosArrowRoundDown } from "react-icons/io";
+import { useProductStore } from '../stores/useProductStore';
 
 export default function CreateProduct() {
 
-  const { categories } = useCategoryStore(); 
+  const { categories , fetchCategories  } = useCategoryStore(); 
 
   const [isOpen, setIsOpen] = useState(false)
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
@@ -31,6 +32,12 @@ export default function CreateProduct() {
   const [newImageUrl, setNewImageUrl] = useState('')
   const [newVideoUrl, setNewVideoUrl] = useState('')
 
+  useEffect(() => {
+    if (categories.length === 0) {
+      fetchCategories(); // Ensure categories are fetched when the product form loads
+    }
+  }, [fetchCategories, categories.length]);
+
   const resetForm = () => {
     setProductName('')
     setBrand('')
@@ -50,7 +57,7 @@ export default function CreateProduct() {
       setIsCancelModalOpen(true)
     } else {
       setIsOpen(false)
-      resetForm()
+      resetForm();
     }
   }
 
@@ -137,21 +144,23 @@ export default function CreateProduct() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(productData),
       });
+
+      const responseData = await response.json(); // ✅ Get error detail
   
       if (response.ok) {
+        useProductStore.getState().triggerRefresh();
         console.log("Product created:", productData.name);
         setIsOpen(false);
         setIsConfirmModalOpen(false);
         resetForm();
       } else {
-        throw new Error("Failed to create product");
+        console.error("Server error:", responseData);
+        throw new Error(responseData.message || "Failed to create product");
       }
     } catch (error) {
       console.error("Error creating product:", error);
     }
   };
-  
-
 
   return (
     <div className="">
@@ -214,8 +223,7 @@ export default function CreateProduct() {
               </div>
             </div>
 
-
-            {/* Second Row: Price, SKU, Dimensions */}
+            {/* Second Row: Price, totalStock, Dimensions */}
             <div className="mt-4 grid grid-cols-3 gap-4">
               <div>
                 <label htmlFor="price" className="block text-sm font-medium text-gray-900">Price</label>
@@ -225,9 +233,9 @@ export default function CreateProduct() {
               </div>
               
               <div>
-                <label htmlFor="sku" className="block text-sm font-medium text-gray-900">Stock</label>
+                <label htmlFor="totalStock" className="block text-sm font-medium text-gray-900">Stock</label>
                 <div className="mt-2">
-                  <input id="sku" type="number" value={totalStock} onChange={(e) => settotalStock(Math.max(0, Number(e.target.value)))} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter SKU" min="0" />
+                  <input id="totalStock" type="number" value={totalStock} onChange={(e) => settotalStock(Math.max(0, Number(e.target.value)))} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter totalStock" min="0" />
                 </div>
               </div>
 

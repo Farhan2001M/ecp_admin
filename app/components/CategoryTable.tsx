@@ -48,8 +48,8 @@ const CategoryTable: React.FC = () => {
               <tr key={category._id} className="border-b bg-white">
                 <td className="py-4 px-3 text-sm text-gray-900">{category.name}</td>
                 <td className="px-3 py-4 text-sm text-gray-500">{category.servings.join(", ")}</td>
-                <td className="px-3 py-4 text-sm text-gray-500">{category.servingsCount}</td>
-                <td className="px-3 py-4 text-sm text-gray-500">{category.productCount}</td>
+                <td className="px-3 py-4 text-sm text-gray-500 text-center pr-16 ">{category.servingsCount}</td>
+                <td className="px-3 py-4 text-sm text-gray-500 text-center pr-14 ">{category.productCount}</td>
                 <td className="px-3 py-4 text-sm">
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${category.isactive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                     {category.isactive ? "Active" : "Inactive"}

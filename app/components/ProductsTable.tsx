@@ -36,7 +36,7 @@ const ProductTable: React.FC = () => {
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Rating</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Dimensions</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Images</th>
-              <th className="px-3 py-3 text-sm font-semibold text-gray-900">Videos</th>
+              <th className="px-3 py-3 text-sm font-semibold text-gray-900">Video</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Actions</th>
             </tr>
           </thead>
@@ -72,15 +72,44 @@ const ProductTable: React.FC = () => {
                   </td>
                   <td className="px-3 py-4 text-sm text-gray-500">{product.ratings}</td>
                   <td className="px-3 py-4 text-sm text-gray-500">{product.dimensions}</td>
-                  <td className="px-3 py-4 text-sm text-gray-500">{product.images.length}</td>
-                  <td className="px-3 py-4 text-sm text-gray-500">{product.videos.length}</td>
-                  <td className="px-3 py-4 text-sm flex space-x-2">
-                    <button onClick={() => setEditingProduct(product)} className="text-indigo-600 hover:text-indigo-900">
-                      <FaEdit className="w-5 h-5" />
-                    </button>
-                    <button onClick={() => setDeletingProduct(product)} className="text-red-600 hover:text-red-900">
-                      <MdDelete className="w-5 h-5" />
-                    </button>
+                  <td className="px-3 py-4 text-sm">
+                    <div className="flex items-center justify-center h-full">
+                      {product.images.length > 0 ? (
+                        <span>{product.images.length}</span>
+                      ) : (
+                        <span className="text-gray-400">0</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-3 py-4 text-sm">
+                    <div className="flex items-center justify-center h-full">
+                      {product.videos ? (
+                        <a
+                          href={product.videos}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-indigo-600 hover:underline"
+                        >
+                          View
+                        </a>
+                      ) : (
+                        <span className="text-gray-400">0</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-3 py-4 text-sm">
+                    <div className="flex space-x-2 items-center h-full">
+                      <button
+                        onClick={() => setEditingProduct(product)}
+                        className="text-indigo-600 hover:text-indigo-900 flex items-center" >
+                        <FaEdit className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => setDeletingProduct(product)}
+                        className="text-red-600 hover:text-red-900 flex items-center" >
+                        <MdDelete className="w-5 h-5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))

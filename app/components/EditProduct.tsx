@@ -1,3 +1,4 @@
+// EditProduct Component
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -8,6 +9,7 @@ import { useCategoryStore } from "../stores/useCategoryStore";
 import { IoIosArrowRoundDown } from "react-icons/io";
 import { Product } from "../types/interfaces";
 import { useProductStore } from "../stores/useProductStore";
+import { ChangeEvent } from 'react'; // Import ChangeEvent from React
 
 interface EditProductProps {
   product: Product;
@@ -23,20 +25,19 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
   const [isDeleteImageModalOpen, setIsDeleteImageModalOpen] = useState(false);
   const [isDeleteVideoModalOpen, setIsDeleteVideoModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-  const [selectedVideoIndex, setSelectedVideoIndex] = useState<number | null>(null);
   const [productName, setProductName] = useState(product.name);
+  const [tagline, setTagline] = useState(product.tagline || '');
   const [brand, setBrand] = useState(product.brand);
   const [categoryID, setCategoryID] = useState(product.categoryID || '');
-  const [price, setPrice] = useState(product.price);
-  const [description, setDescription] = useState(product.description);
-  const [totalStock, settotalStock] = useState(product.totalStock);
-  const [images, setImages] = useState(product.images);
-  const [videos, setVideos] = useState(product.videos);
+  const [price, setPrice] = useState(product.price.toString()); // Convert to string
+  const [totalStock, settotalStock] = useState(product.totalStock.toString()); // Convert to string
+  const [ratings, setRatings] = useState(product.ratings.toString()); // Convert to string
   const [dimensions, setDimensions] = useState(product.dimensions);
+  const [description, setDescription] = useState(product.description);
+  const [images, setImages] = useState(product.images);
+  const [video, setVideo] = useState(product.videos || ''); // Single video URL
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newVideoUrl, setNewVideoUrl] = useState('');
-  const [tagline, setTagline] = useState(product.tagline || '');
-  const [ratings, setRatings] = useState(product.ratings);
 
   useEffect(() => {
     if (categories.length === 0) {
@@ -49,19 +50,31 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
     setTagline(product.tagline);
     setBrand(product.brand);
     setCategoryID(product.categoryID || '');
-    setPrice(product.price);
+    setPrice(product.price.toString()); // Reset to string
     setDescription(product.description);
-    settotalStock(product.totalStock);
-    setRatings(product.ratings);
+    settotalStock(product.totalStock.toString()); // Reset to string
+    setRatings(product.ratings.toString()); // Reset to string
     setImages(product.images);
-    setVideos(product.videos);
+    setVideo(product.videos || ''); // Reset to single video URL
     setDimensions(product.dimensions);
     setNewImageUrl('');
     setNewVideoUrl('');
   };
 
   const closeEditProductModal = () => {
-    if (productName.trim() !== product.name || tagline.trim() !== product.tagline || brand.trim() !== product.brand || categoryID !== product.categoryID || price !== product.price || description.trim() !== product.description || totalStock !== product.totalStock || ratings !== product.ratings || images !== product.images || videos !== product.videos || dimensions !== product.dimensions) {
+    if (
+      productName.trim() !== product.name ||
+      tagline.trim() !== product.tagline ||
+      brand.trim() !== product.brand ||
+      categoryID !== product.categoryID ||
+      price !== product.price.toString() || // Compare as strings
+      description.trim() !== product.description ||
+      totalStock !== product.totalStock.toString() || // Compare as strings
+      ratings !== product.ratings.toString() || // Compare as strings
+      images !== product.images ||
+      video !== product.videos || // Compare single video URL 
+      dimensions !== product.dimensions
+    ) {
       setIsCancelModalOpen(true);
     } else {
       setIsOpen(false);
@@ -89,20 +102,14 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
 
   const addVideo = () => {
     const trimmedVideoUrl = newVideoUrl.trim();
-    if (trimmedVideoUrl && !videos.includes(trimmedVideoUrl)) {
-      setVideos([...videos, trimmedVideoUrl]);
+    if (trimmedVideoUrl) {
+      setVideo(trimmedVideoUrl); // Set single video URL
       setNewVideoUrl('');
     }
   };
 
   const openDeleteImageModal = (index: number) => {
-    setSelectedImageIndex(index);
     setIsDeleteImageModalOpen(true);
-  };
-
-  const openDeleteVideoModal = (index: number) => {
-    setSelectedVideoIndex(index);
-    setIsDeleteVideoModalOpen(true);
   };
 
   const confirmDeleteImage = () => {
@@ -114,11 +121,8 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
   };
 
   const confirmDeleteVideo = () => {
-    if (selectedVideoIndex !== null) {
-      setVideos(videos.filter((_, i) => i !== selectedVideoIndex));
-    }
+    setVideo(''); // Clear the single video URL
     setIsDeleteVideoModalOpen(false);
-    setSelectedVideoIndex(null);
   };
 
   const cancelDeleteImage = () => {
@@ -128,7 +132,30 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
 
   const cancelDeleteVideo = () => {
     setIsDeleteVideoModalOpen(false);
-    setSelectedVideoIndex(null);
+  };
+
+  // Price Input Handler
+  const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || (Number(value) >= 0 && Number(value) <= 99999)) {
+      setPrice(value);
+    }
+  };
+
+  // Stock Input Handler
+  const handleStockChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || (Number(value) >= 0 && Number(value) <= 9999)) {
+      settotalStock(value);
+    }
+  };
+
+  // Ratings Input Handler
+  const handleRatingsChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || (Number(value) >= 0 && Number(value) <= 5 && /^\d*(\.\d{0,1})?$/.test(value))) {
+      setRatings(value);
+    }
   };
 
   const updateProduct = async () => {
@@ -138,13 +165,13 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
         tagline: tagline.trim(),
         brand: brand.trim(),
         categoryID,
-        price,
+        price: price === '' ? 0 : Number(price), // Convert to number
         description: description.trim(),
-        totalStock,
+        totalStock: totalStock === '' ? 0 : Number(totalStock), // Convert to number
         images,
-        videos,
-        inStock: totalStock > 0,
-        ratings: ratings,
+        videos: video, // Single video URL
+        inStock: totalStock === '' ? false : Number(totalStock) > 0, // Handle empty stock
+        ratings: ratings === '' ? 0 : Number(ratings), // Convert to number
         dimensions: dimensions.trim(),
       };
 
@@ -239,21 +266,21 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
               <div>
                 <label htmlFor="price" className="block text-sm font-medium text-gray-900">Price</label>
                 <div className="mt-2">
-                  <input id="price" type="number" value={price} onChange={(e) => setPrice(Math.max(0, Number(e.target.value)))} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter price" min="0" />
+                  <input id="price" type="number" value={price} onChange={handlePriceChange} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter price" min="0" max="99999" />
                 </div>
               </div>
               
               <div>
                 <label htmlFor="totalStock" className="block text-sm font-medium text-gray-900">Stock</label>
                 <div className="mt-2">
-                  <input id="totalStock" type="number" value={totalStock} onChange={(e) => settotalStock(Math.max(0, Number(e.target.value)))} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter totalStock" min="0" />
+                  <input id="totalStock" type="number" value={totalStock} onChange={handleStockChange} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter totalStock" min="0" max="9999" />
                 </div>
               </div>
 
               <div>
                 <label htmlFor="ratings" className="block text-sm font-medium text-gray-900">Ratings</label>
                 <div className="mt-2">
-                  <input id="ratings" type="number" value={ratings} onChange={(e) => setRatings(Math.min(5, Math.max(0, parseFloat(e.target.value))))} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter ratings (0 to 5)" min="0" max="5" step="0.1" />
+                  <input id="ratings" type="number" value={ratings} onChange={handleRatingsChange} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter ratings (0 to 5)" min="0" max="5" step="0.1" />
                 </div>
               </div>
 
@@ -285,10 +312,10 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
               </div>
 
               <div>
-                <label htmlFor="videoUrl" className="block text-sm font-medium text-gray-900">Videos (Optional)</label>
+                <label htmlFor="videoUrl" className="block text-sm font-medium text-gray-900">Video (Optional)</label>
                 <div className="flex gap-2 mt-1">
                   <input id="videoUrl" type="text" value={newVideoUrl} onChange={(e) => setNewVideoUrl(e.target.value)} className="flex-1 p-2 border rounded-lg focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600" placeholder="Enter video URL" />
-                  <button onClick={addVideo} disabled={!newVideoUrl.trim()} className={`px-4 py-2 rounded-lg shadow ${!newVideoUrl.trim() ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-500'}`} >
+                  <button onClick={addVideo} disabled={!newVideoUrl.trim() || !!video} className={`px-4 py-2 rounded-lg shadow ${!newVideoUrl.trim() || !!video ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-500'}`} >
                     Add
                   </button>
                 </div>
@@ -305,23 +332,41 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
                   </button>
                 </div>
               ))}
-              {videos.map((video, index) => (
-                <div key={index} className="relative w-32 h-32">
+              {video && (
+                <div className="relative w-32 h-32">
                   <video src={video} controls className="w-full h-full object-cover rounded-lg" />
-                  <button onClick={() => openDeleteVideoModal(index)} className="absolute top-2 left-2 bg-red-500 text-white rounded-full p-1">
+                  <button onClick={() => setIsDeleteVideoModalOpen(true)} className="absolute top-2 left-2 bg-red-500 text-white rounded-full p-1">
                     <FaTimes className="w-4 h-4" />
                   </button>
                 </div>
-              ))}
+              )}
             </div>
 
             {/* Update Product Button */}
             <div className="mt-3 text-center">
               <button
                 onClick={() => setIsConfirmModalOpen(true)}
-                disabled={!productName.trim() || !tagline.trim() || !brand.trim() || !categoryID || price <= 0 || !description.trim() || totalStock <= 0 || images.length === 0}
+                disabled={
+                  !productName.trim() ||
+                  !tagline.trim() ||
+                  !brand.trim() ||
+                  !categoryID ||
+                  (price === '' || Number(price) <= 0) || // Convert to number
+                  (totalStock === '' || Number(totalStock) <= 0) || // Convert to number
+                  (ratings === '' || Number(ratings) <= 0) || // Convert to number
+                  !description.trim() ||
+                  images.length === 0
+                }
                 className={`px-24 py-2 text-white rounded-lg shadow ${
-                  !productName.trim() || !brand.trim() || !categoryID || price <= 0 || !description.trim() || totalStock <= 0 || images.length === 0
+                  !productName.trim() ||
+                  !tagline.trim() ||
+                  !brand.trim() ||
+                  !categoryID ||
+                  (price === '' || Number(price) <= 0) ||
+                  (totalStock === '' || Number(totalStock) <= 0) ||
+                  (ratings === '' || Number(ratings) <= 0) ||
+                  !description.trim() ||
+                  images.length === 0
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-indigo-600 hover:bg-indigo-500'
                 }`}

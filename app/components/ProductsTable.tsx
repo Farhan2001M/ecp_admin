@@ -27,6 +27,7 @@ const ProductTable: React.FC = () => {
           <thead className="bg-gray-200">
             <tr>
               <th className="py-3 px-3 text-sm font-semibold text-gray-900">Name</th>
+              <th className="px-3 py-3 text-sm font-semibold text-gray-900">Tagline</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Brand</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Category</th> 
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Price</th>
@@ -57,6 +58,7 @@ const ProductTable: React.FC = () => {
                     )}
                     <span>{product.name}</span>
                   </td>
+                  <td className="px-3 py-4 text-sm text-gray-500">{product.tagline}</td>
                   <td className="px-3 py-4 text-sm text-gray-500">{product.brand}</td>
                   <td className="px-3 py-4 text-sm text-gray-500">
                     {typeof product.categoryID === "object" ? product.categoryID.name : "Unknown"}

@@ -18,7 +18,8 @@ export interface Product {
   totalStock: number;
   images: string[]; // Assuming images are stored as URLs
   videos: string[]; // Assuming videos are stored as URLs
-  inStock: boolean; 
+  inStock: boolean;
   ratings: number;
+  tagline: string;
   dimensions: string;
-} 
+}

@@ -21,17 +21,19 @@ export default function CreateProduct() {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const [selectedVideoIndex, setSelectedVideoIndex] = useState<number | null>(null)
   const [productName, setProductName] = useState('')
+  const [tagline, setTagline] = useState('');
   const [brand, setBrand] = useState('')
   const [categoryID, setCategoryID] = useState('')
   const [price, setPrice] = useState<number>(0)
-  const [description, setDescription] = useState('')
   const [totalStock, settotalStock] = useState<number>(0)
+  const [ratings, setRatings] = useState<number>(0);
+  const [dimensions, setDimensions] = useState('')
+  const [description, setDescription] = useState('')
   const [images, setImages] = useState<string[]>([])
   const [videos, setVideos] = useState<string[]>([])
-  const [dimensions, setDimensions] = useState('')
   const [newImageUrl, setNewImageUrl] = useState('')
   const [newVideoUrl, setNewVideoUrl] = useState('')
-
+  
   useEffect(() => {
     if (categories.length === 0) {
       fetchCategories(); // Ensure categories are fetched when the product form loads
@@ -40,20 +42,22 @@ export default function CreateProduct() {
 
   const resetForm = () => {
     setProductName('')
+    setTagline('');
     setBrand('')
     setCategoryID('')
     setPrice(0)
-    setDescription('')
     settotalStock(0)
+    setRatings(0);
+    setDimensions('')
+    setDescription('')
     setImages([])
     setVideos([])
-    setDimensions('')
     setNewImageUrl('')
     setNewVideoUrl('')
   }
 
   const closeCreateProductModal = () => {
-    if (productName.trim() || brand.trim() || categoryID || price > 0 || description.trim() || totalStock < 0 || images.length > 0) {
+    if (productName.trim() || tagline.trim() || brand.trim() || categoryID || price > 0 || totalStock > 0 || ratings > 0 || description.trim() ||  images.length > 0 || videos.length > 0  ) {
       setIsCancelModalOpen(true)
     } else {
       setIsOpen(false)
@@ -128,15 +132,16 @@ export default function CreateProduct() {
       const productData = {
         name: productName.trim(),
         brand: brand.trim(),
+        tagline: tagline.trim(),
         categoryID,
         price,
-        description: description.trim(),
         totalStock,
+        ratings,
+        dimensions: dimensions.trim(),
+        description: description.trim(),
         images,
         videos,
         inStock: totalStock > 0,
-        ratings: 0,
-        dimensions: dimensions.trim(),
       };
   
       const response = await fetch("http://localhost:5000/api/products", {
@@ -188,11 +193,19 @@ export default function CreateProduct() {
             </div>
 
             {/* First Row: Product Name, Brand, Category */}
-            <div className="mt-4 grid grid-cols-3 gap-4">
+            <div className="mt-4 grid grid-cols-4 gap-4">
               <div>
                 <label htmlFor="productName" className="block text-sm font-medium text-gray-900">Product Name</label>
                 <div className="mt-2">
                   <input id="productName" type="text" value={productName} onChange={(e) => setProductName(e.target.value)} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter product name" />
+                </div>
+              </div>
+
+              {/* Tagline Input */}
+              <div>
+                <label htmlFor="tagline" className="block text-sm font-medium text-gray-900">Tagline</label>
+                <div className="mt-2">
+                  <input id="tagline" type="text" value={tagline} onChange={(e) => setTagline(e.target.value)} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter a tagline (max 50 characters)" maxLength={50} />
                 </div>
               </div>
 
@@ -224,7 +237,7 @@ export default function CreateProduct() {
             </div>
 
             {/* Second Row: Price, totalStock, Dimensions */}
-            <div className="mt-4 grid grid-cols-3 gap-4">
+            <div className="mt-4 grid grid-cols-4 gap-4">
               <div>
                 <label htmlFor="price" className="block text-sm font-medium text-gray-900">Price</label>
                 <div className="mt-2">
@@ -236,6 +249,14 @@ export default function CreateProduct() {
                 <label htmlFor="totalStock" className="block text-sm font-medium text-gray-900">Stock</label>
                 <div className="mt-2">
                   <input id="totalStock" type="number" value={totalStock} onChange={(e) => settotalStock(Math.max(0, Number(e.target.value)))} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter totalStock" min="0" />
+                </div>
+              </div>
+
+              {/* Ratings Input */}
+              <div>
+                <label htmlFor="ratings" className="block text-sm font-medium text-gray-900">Ratings</label>
+                <div className="mt-2">
+                  <input id="ratings" type="number" value={ratings} onChange={(e) => setRatings(Math.max(0, Number(e.target.value)))} className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" placeholder="Enter ratings (0 to 5)" min="0" max="5"  />
                 </div>
               </div>
 
@@ -301,9 +322,9 @@ export default function CreateProduct() {
             <div className="mt-3 text-center">
               <button
                 onClick={() => setIsConfirmModalOpen(true)}
-                disabled={!productName.trim() || !brand.trim() || !categoryID || price <= 0 || !description.trim() || totalStock <= 0 || images.length === 0}
+                disabled={!productName.trim() || !tagline.trim() || !brand.trim() || !categoryID || price <= 0 || totalStock <= 0 || ratings<= 0 || !description.trim() || images.length === 0}
                 className={`px-24 py-2 text-white rounded-lg shadow ${
-                  !productName.trim() || !brand.trim() || !categoryID || price <= 0 || !description.trim() || totalStock <= 0 || images.length === 0
+                  !productName.trim() || !tagline.trim() || !brand.trim() || !categoryID || price <= 0 || totalStock <= 0 || ratings<= 0 || !description.trim() ||  images.length === 0
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-indigo-600 hover:bg-indigo-500'
                 }`}

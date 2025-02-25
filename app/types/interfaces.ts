@@ -20,6 +20,6 @@ export interface Product {
   dimensions: string;
   description: string;
   images: string[]; 
-  videos: string; 
+  video: string; 
   inStock: boolean;
 }

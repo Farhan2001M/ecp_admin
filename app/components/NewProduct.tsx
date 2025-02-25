@@ -171,7 +171,7 @@ export default function CreateProduct() {
         dimensions: dimensions.trim(),
         description: description.trim(),
         images,
-        videos: video, // Send single video URL
+        video: video, // Send single video URL
         inStock: totalStock === '' ? false : Number(totalStock) > 0, // Handle empty stock
       };
   

@@ -35,7 +35,7 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
   const [dimensions, setDimensions] = useState(product.dimensions);
   const [description, setDescription] = useState(product.description);
   const [images, setImages] = useState(product.images);
-  const [video, setVideo] = useState(product.videos || ''); // Single video URL
+  const [video, setVideo] = useState(product.video || ''); // Single video URL
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newVideoUrl, setNewVideoUrl] = useState('');
 
@@ -55,7 +55,7 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
     settotalStock(product.totalStock.toString()); // Reset to string
     setRatings(product.ratings.toString()); // Reset to string
     setImages(product.images);
-    setVideo(product.videos || ''); // Reset to single video URL
+    setVideo(product.video || ''); // Reset to single video URL
     setDimensions(product.dimensions);
     setNewImageUrl('');
     setNewVideoUrl('');
@@ -72,7 +72,7 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
       totalStock !== product.totalStock.toString() || // Compare as strings
       ratings !== product.ratings.toString() || // Compare as strings
       images !== product.images ||
-      video !== product.videos || // Compare single video URL 
+      video !== product.video || // Compare single video URL 
       dimensions !== product.dimensions
     ) {
       setIsCancelModalOpen(true);
@@ -169,7 +169,7 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
         description: description.trim(),
         totalStock: totalStock === '' ? 0 : Number(totalStock), // Convert to number
         images,
-        videos: video, // Single video URL
+        video: video, // Single video URL
         inStock: totalStock === '' ? false : Number(totalStock) > 0, // Handle empty stock
         ratings: ratings === '' ? 0 : Number(ratings), // Convert to number
         dimensions: dimensions.trim(),

@@ -14,6 +14,10 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      cursor: {
+        grab: 'grab',
+        grabbing: 'grabbing',
+      }
     },
   },
   darkMode: "class",

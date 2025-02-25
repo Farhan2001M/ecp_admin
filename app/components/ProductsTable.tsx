@@ -83,9 +83,9 @@ const ProductTable: React.FC = () => {
                   </td>
                   <td className="px-3 py-4 text-sm">
                     <div className="flex items-center justify-center h-full">
-                      {product.videos ? (
+                      {product.video ? (
                         <a
-                          href={product.videos}
+                          href={product.video}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-indigo-600 hover:underline"

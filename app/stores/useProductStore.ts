@@ -10,6 +10,7 @@ interface ProductStore {
   addProduct: (product: Product) => void;
   updateProduct: (updatedProduct: Product) => void;
   removeProduct: (id: string) => void;
+  toggleProductStatus: (id: string) => Promise<void>;
 }
 
 export const useProductStore = create<ProductStore>((set) => ({
@@ -52,4 +53,23 @@ export const useProductStore = create<ProductStore>((set) => ({
     }));
     set((state) => ({ refreshTrigger: state.refreshTrigger + 1 })); // ✅ Ensure UI updates
   },
+  toggleProductStatus: async (id) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/products/${id}/toggle-status`, {
+        method: "PUT",
+      });
+      const updatedProduct = await res.json();
+  
+      set((state) => ({
+        products: state.products.map((product) =>
+          product._id === updatedProduct._id ? updatedProduct : product
+        ),
+        refreshTrigger: state.refreshTrigger + 1, // Increment refreshTrigger to force re-render
+      }));
+    } catch (error) {
+      console.error("Failed to toggle product status:", error);
+    }
+  },
 }));
+
+

@@ -21,5 +21,5 @@ export interface Product {
   description: string;
   images: string[]; 
   video: string; 
-  inStock: boolean;
+  status: boolean; // Change to boolean
 }

@@ -318,7 +318,7 @@ export default function CreateProduct() {
               </div>
 
               <div>
-                <label htmlFor="videoUrl" className="block text-sm font-medium text-gray-900">Videos (Optional)</label>
+                <label htmlFor="videoUrl" className="block text-sm font-medium text-gray-900">Video (Optional)</label>
                 <div className="flex gap-2 mt-1">
                   <input
                     id="videoUrl"
@@ -327,6 +327,7 @@ export default function CreateProduct() {
                     onChange={(e) => setNewVideoUrl(e.target.value)}
                     className="flex-1 p-2 border rounded-lg focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
                     placeholder="Enter video URL"
+                    disabled={!!video} // Disable if video is already added
                   />
                   <button
                     onClick={addVideo}

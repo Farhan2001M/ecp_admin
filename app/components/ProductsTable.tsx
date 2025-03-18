@@ -7,11 +7,22 @@ import { MdDelete } from "react-icons/md";
 import { Product } from "../types/interfaces";
 import EditProduct from "./EditProduct";
 import DeleteProduct from "./DeleteProduct";
+import ConfirmationModal from "./ProductStatusToggleModal"; // Import the new component
+import { Switch } from '@headlessui/react'
 
 const ProductTable: React.FC = () => {
-  const { products, fetchProducts } = useProductStore();
+  const { products, fetchProducts , toggleProductStatus } = useProductStore();
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+
+  const handleToggleStatus = async () => {
+    if (selectedProductId) {
+      await toggleProductStatus(selectedProductId);
+      setIsConfirmationModalOpen(false);
+    }
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -19,6 +30,14 @@ const ProductTable: React.FC = () => {
 
   return (
     <div className="mt-8 flow-root overflow-hidden">
+
+      <ConfirmationModal
+        isOpen={isConfirmationModalOpen}
+        onClose={() => setIsConfirmationModalOpen(false)}
+        onConfirm={handleToggleStatus}
+        message="The status will be reflected on the website immediately. Are you sure you want to proceed?"
+      />
+      
       {editingProduct && <EditProduct product={editingProduct} onClose={() => setEditingProduct(null)} />}
       {deletingProduct && <DeleteProduct product={deletingProduct} onClose={() => setDeletingProduct(null)} />}
 
@@ -32,8 +51,8 @@ const ProductTable: React.FC = () => {
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Category</th> 
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Price</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Stock</th>
-              <th className="px-3 py-3 text-sm font-semibold text-gray-900">In Stock</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Rating</th>
+              <th className="px-3 py-3 text-sm font-semibold text-gray-900">Status</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Dimensions</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Images</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Video</th>
@@ -65,12 +84,27 @@ const ProductTable: React.FC = () => {
                   </td>
                   <td className="px-3 py-4 text-sm text-gray-500">${product.price.toFixed(2)}</td>
                   <td className="px-3 py-4 text-sm text-gray-500">{product.totalStock}</td>
-                  <td className="px-3 py-4 text-sm">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${product.inStock ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                      {product.inStock ? "Yes" : "No"}
-                    </span>
-                  </td>
+                  
                   <td className="px-3 py-4 text-sm text-gray-500">{product.ratings}</td>
+                  <td className="px-3 py-4 text-sm text-gray-500">
+                    <Switch
+                      checked={product.status} // Use boolean status
+                      onChange={() => {
+                        setSelectedProductId(product._id);
+                        setIsConfirmationModalOpen(true);
+                      }}
+                      className={`${
+                        product.status ? "bg-green-500" : "bg-gray-300"
+                      } relative inline-flex h-6 w-11 items-center rounded-full`}
+                    >
+                      <span className="sr-only">Toggle status</span>
+                      <span
+                        className={`${
+                          product.status ? "translate-x-6" : "translate-x-1"
+                        } inline-block h-4 w-4 transform rounded-full bg-white transition`}
+                      />
+                    </Switch>
+                  </td>
                   <td className="px-3 py-4 text-sm text-gray-500">{product.dimensions}</td>
                   <td className="px-3 py-4 text-sm">
                     <div className="flex items-center justify-center h-full">

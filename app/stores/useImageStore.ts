@@ -3,22 +3,24 @@ import { create } from "zustand";
 
 interface ImageStore {
   urls: string[]; // Array of image URLs
+  originalUrls: string[]; // Original order of image URLs
   fetchImages: () => Promise<void>;
   addImage: (url: string) => void; // Add to local state only
   updateImageOrder: (urls: string[]) => Promise<void>; // Update database
   removeImage: (index: number) => void; // Remove from local state
-  clearImages: () => void; // Clear local state after publishing
+  hasChanges: () => boolean; // Check if changes have been made
 }
 
-export const useImageStore = create<ImageStore>((set) => ({
+export const useImageStore = create<ImageStore>((set, get) => ({
   urls: [],
+  originalUrls: [],
 
   // Fetch images from the backend (called once)
   fetchImages: async () => {
     try {
       const res = await fetch("http://localhost:5000/api/images");
       const data = await res.json();
-      set({ urls: data });
+      set({ urls: data, originalUrls: data }); // Initialize both urls and originalUrls
     } catch (error) {
       console.error("Failed to fetch images:", error);
     }
@@ -45,7 +47,7 @@ export const useImageStore = create<ImageStore>((set) => ({
       }
 
       const data = await response.json();
-      set({ urls: data.urls }); // Update local state with the new URLs from the database
+      set({ urls: data.urls, originalUrls: data.urls }); // Update both urls and originalUrls
     } catch (error) {
       console.error("Failed to update image order:", error);
       throw error;
@@ -59,8 +61,9 @@ export const useImageStore = create<ImageStore>((set) => ({
     }));
   },
 
-  // Clear the local state after publishing
-  clearImages: () => {
-    set({ urls: [] });
+  // Check if changes have been made
+  hasChanges: () => {
+    const { urls, originalUrls } = get();
+    return JSON.stringify(urls) !== JSON.stringify(originalUrls);
   },
 }));

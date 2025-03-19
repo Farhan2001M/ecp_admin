@@ -8,7 +8,7 @@ import Layout from "../components/Layout";
 import { useImageStore } from "../stores/useImageStore";
 
 const AdminSettings: React.FC = () => {
-  const { urls, fetchImages, addImage, updateImageOrder, removeImage, clearImages } = useImageStore();
+  const { urls, fetchImages, addImage, updateImageOrder, removeImage, hasChanges } = useImageStore();
   const [inputUrl, setInputUrl] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
 
@@ -35,7 +35,6 @@ const AdminSettings: React.FC = () => {
     try {
       await updateImageOrder(urls); // Update the database with the final list
       alert("Images published successfully!");
-      clearImages(); // Clear the local state after publishing
     } catch (error) {
       console.error("Error publishing images:", error);
       alert("An error occurred while publishing images.");
@@ -80,21 +79,27 @@ const AdminSettings: React.FC = () => {
       <SortableList
         onSortEnd={onSortEnd}
         className="flex flex-wrap justify-center gap-4 select-none"
-        draggedItemClassName="shadow-2xl opacity-75"
       >
         {urls.map((url, index) => (
           <SortableItem key={index}>
-            <div className="relative flex-shrink-0 cursor-grab shadow-lg rounded-full">
+            <div className="relative flex-shrink-0 cursor-grab">
+              {/* Avatar component for image */}
               <Avatar
-                className="w-36 h-36"
                 alt={`Image ${index + 1}`}
                 src={url}
+                sx={{
+                  width: 250, // Specify the width and height here
+                  height: 150,
+                  borderRadius: "12px", // Optional: adjust border-radius if you need rounded corners
+                  border: "none", // Remove any extra border or circle
+                }}
                 imgProps={{ draggable: false }}
               />
+              {/* Correctly position the delete icon */}
               <Fab
                 color="primary"
                 size="small"
-                className="absolute bottom-1 right-1"
+                className="absolute bottom-10 right-0" // Adjusted positioning
                 aria-label="delete"
                 onClick={() => handleDeleteImage(index)}
               >
@@ -109,9 +114,9 @@ const AdminSettings: React.FC = () => {
       <div className="mt-4 text-center">
         <button
           onClick={handlePublishImages}
-          disabled={urls.length === 0 || isPublishing}
+          disabled={!hasChanges() || isPublishing} // Enable only if changes exist
           className={`px-4 py-2 rounded-lg ${
-            urls.length === 0 || isPublishing
+            !hasChanges() || isPublishing
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-green-600 text-white hover:bg-green-500"
           }`}
@@ -124,6 +129,301 @@ const AdminSettings: React.FC = () => {
 };
 
 export default AdminSettings;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
+// import React, { useEffect, useState } from "react";
+// import SortableList, { SortableItem } from "react-easy-sort";
+// import { Avatar, Fab } from "@mui/material";
+// import DeleteIcon from "@mui/icons-material/Delete";
+// import { arrayMoveImmutable } from "array-move";
+// import Layout from "../components/Layout";
+// import { useImageStore } from "../stores/useImageStore";
+
+// const AdminSettings: React.FC = () => {
+//   const { urls, fetchImages, addImage, updateImageOrder, removeImage, hasChanges } = useImageStore();
+//   const [inputUrl, setInputUrl] = useState("");
+//   const [isPublishing, setIsPublishing] = useState(false);
+
+//   // Fetch images once when the component mounts
+//   useEffect(() => {
+//     fetchImages();
+//   }, [fetchImages]);
+
+//   const handleAddImage = () => {
+//     if (inputUrl.trim() && urls.length < 10) {
+//       addImage(inputUrl.trim()); // Add to local state only
+//       setInputUrl("");
+//     }
+//   };
+
+//   const handleDeleteImage = (index: number) => {
+//     removeImage(index); // Remove from local state
+//   };
+
+//   const handlePublishImages = async () => {
+//     if (urls.length === 0) return;
+
+//     setIsPublishing(true);
+//     try {
+//       await updateImageOrder(urls); // Update the database with the final list
+//       alert("Images published successfully!");
+//     } catch (error) {
+//       console.error("Error publishing images:", error);
+//       alert("An error occurred while publishing images.");
+//     } finally {
+//       setIsPublishing(false);
+//     }
+//   };
+
+//   const onSortEnd = (oldIndex: number, newIndex: number) => {
+//     const newUrls = arrayMoveImmutable(urls, oldIndex, newIndex);
+//     useImageStore.setState({ urls: newUrls }); // Update local state
+//   };
+
+//   return (
+//     <Layout>
+//       <h1 className="text-2xl font-bold text-center mb-4">Admin Settings</h1>
+
+//       {/* Input and Add Button */}
+//       <div className="flex gap-2 mb-4">
+//         <input
+//           type="text"
+//           value={inputUrl}
+//           onChange={(e) => setInputUrl(e.target.value)}
+//           placeholder="Enter image URL"
+//           className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//           disabled={urls.length >= 10}
+//         />
+//         <button
+//           onClick={handleAddImage}
+//           disabled={!inputUrl.trim() || urls.length >= 10}
+//           className={`px-4 py-2 rounded-lg ${
+//             !inputUrl.trim() || urls.length >= 10
+//               ? "bg-gray-400 cursor-not-allowed"
+//               : "bg-blue-600 text-white hover:bg-blue-500"
+//           }`}
+//         >
+//           Add Image
+//         </button>
+//       </div>
+
+//       {/* Sortable Image List */}
+//       <SortableList
+//         onSortEnd={onSortEnd}
+//         className="flex flex-wrap justify-center gap-4 select-none"
+//         draggedItemClassName="shadow-2xl opacity-75"
+//       >
+//         {urls.map((url, index) => (
+//           <SortableItem key={index}>
+//             <div className="relative flex-shrink-0 cursor-grab shadow-lg rounded-full">
+//               <Avatar
+//                 className="w-36 h-36 md:w-48 md:h-48" // Larger size for medium screens
+//                 alt={`Image ${index + 1}`}
+//                 src={url}
+//                 imgProps={{ draggable: false }}
+//               />
+//               <Fab
+//                 color="primary"
+//                 size="small"
+//                 className="absolute bottom-1 right-1"
+//                 aria-label="delete"
+//                 onClick={() => handleDeleteImage(index)}
+//               >
+//                 <DeleteIcon />
+//               </Fab>
+//             </div>
+//           </SortableItem>
+//         ))}
+//       </SortableList>
+
+//       {/* Publish Button */}
+//       <div className="mt-4 text-center">
+//         <button
+//           onClick={handlePublishImages}
+//           disabled={!hasChanges() || isPublishing} // Enable only if changes exist
+//           className={`px-4 py-2 rounded-lg ${
+//             !hasChanges() || isPublishing
+//               ? "bg-gray-400 cursor-not-allowed"
+//               : "bg-green-600 text-white hover:bg-green-500"
+//           }`}
+//         >
+//           {isPublishing ? "Publishing..." : "Publish Images"}
+//         </button>
+//       </div>
+//     </Layout>
+//   );
+// };
+
+// export default AdminSettings;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
+// import React, { useEffect, useState } from "react";
+// import SortableList, { SortableItem } from "react-easy-sort";
+// import { Avatar, Fab } from "@mui/material";
+// import DeleteIcon from "@mui/icons-material/Delete";
+// import { arrayMoveImmutable } from "array-move";
+// import Layout from "../components/Layout";
+// import { useImageStore } from "../stores/useImageStore";
+
+// const AdminSettings: React.FC = () => {
+//   const { urls, fetchImages, addImage, updateImageOrder, removeImage, hasChanges } = useImageStore();
+//   const [inputUrl, setInputUrl] = useState("");
+//   const [isPublishing, setIsPublishing] = useState(false);
+
+//   // Fetch images once when the component mounts
+//   useEffect(() => {
+//     fetchImages();
+//   }, [fetchImages]);
+
+//   const handleAddImage = () => {
+//     if (inputUrl.trim() && urls.length < 10) {
+//       addImage(inputUrl.trim()); // Add to local state only
+//       setInputUrl("");
+//     }
+//   };
+
+//   const handleDeleteImage = (index: number) => {
+//     removeImage(index); // Remove from local state
+//   };
+
+//   const handlePublishImages = async () => {
+//     if (urls.length === 0) return;
+
+//     setIsPublishing(true);
+//     try {
+//       await updateImageOrder(urls); // Update the database with the final list
+//       alert("Images published successfully!");
+//     } catch (error) {
+//       console.error("Error publishing images:", error);
+//       alert("An error occurred while publishing images.");
+//     } finally {
+//       setIsPublishing(false);
+//     }
+//   };
+
+//   const onSortEnd = (oldIndex: number, newIndex: number) => {
+//     const newUrls = arrayMoveImmutable(urls, oldIndex, newIndex);
+//     useImageStore.setState({ urls: newUrls }); // Update local state
+//   };
+
+//   return (
+//     <Layout>
+//       <h1 className="text-2xl font-bold text-center mb-4">Admin Settings</h1>
+
+//       {/* Input and Add Button */}
+//       <div className="flex gap-2 mb-4">
+//         <input
+//           type="text"
+//           value={inputUrl}
+//           onChange={(e) => setInputUrl(e.target.value)}
+//           placeholder="Enter image URL"
+//           className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//           disabled={urls.length >= 10}
+//         />
+//         <button
+//           onClick={handleAddImage}
+//           disabled={!inputUrl.trim() || urls.length >= 10}
+//           className={`px-4 py-2 rounded-lg ${
+//             !inputUrl.trim() || urls.length >= 10
+//               ? "bg-gray-400 cursor-not-allowed"
+//               : "bg-blue-600 text-white hover:bg-blue-500"
+//           }`}
+//         >
+//           Add Image
+//         </button>
+//       </div>
+
+//       {/* Sortable Image List */}
+//       <SortableList
+//         onSortEnd={onSortEnd}
+//         className="flex flex-wrap justify-center gap-4 select-none"
+//         draggedItemClassName="shadow-2xl opacity-75"
+//       >
+//         {urls.map((url, index) => (
+//           <SortableItem key={index}>
+//             <div className="relative flex-shrink-0 cursor-grab">
+//               {/* Avatar component for image */}
+//               <Avatar
+//                 alt={`Image ${index + 1}`}
+//                 src={url}
+//                 sx={{
+//                   width: 150, // Specify the width and height here
+//                   height: 150,
+//                   borderRadius: "12px", // Optional: adjust border-radius if you need rounded corners
+//                   border: "none", // Remove any extra border or circle
+//                 }}
+//                 imgProps={{ draggable: false }}
+//               />
+//               {/* Correctly position the delete icon */}
+//               <Fab
+//                 color="primary"
+//                 size="small"
+//                 className="absolute bottom-10 right-0" // Adjusted positioning
+//                 aria-label="delete"
+//                 onClick={() => handleDeleteImage(index)}
+//               >
+//                 <DeleteIcon />
+//               </Fab>
+//             </div>
+//           </SortableItem>
+//         ))}
+//       </SortableList>
+
+//       {/* Publish Button */}
+//       <div className="mt-4 text-center">
+//         <button
+//           onClick={handlePublishImages}
+//           disabled={!hasChanges() || isPublishing} // Enable only if changes exist
+//           className={`px-4 py-2 rounded-lg ${
+//             !hasChanges() || isPublishing
+//               ? "bg-gray-400 cursor-not-allowed"
+//               : "bg-green-600 text-white hover:bg-green-500"
+//           }`}
+//         >
+//           {isPublishing ? "Publishing..." : "Publish Images"}
+//         </button>
+//       </div>
+//     </Layout>
+//   );
+// };
+
+// export default AdminSettings;
+
+
+
+
+
+
+
+
 
 
 

@@ -1,3 +1,9 @@
+export interface SaleHistoryEntry {
+  startDate: string;
+  endDate: string;
+  percentage: number;
+}
+
 export interface Category {
   _id: string;
   name: string;
@@ -6,6 +12,11 @@ export interface Category {
   productCount: number;
   isactive: boolean;
   highlighted: boolean;
+  saleStatus: "Inactive" | "Active" | "Pending" | "Cancelled";
+  saleStartDate?: string;
+  saleEndDate?: string;
+  salePercentage?: number;
+  saleHistory: SaleHistoryEntry[];
 }
 
 export interface Product {

@@ -95,8 +95,9 @@ export default function CreateProduct() {
   }
 
   const openDeleteImageModal = (index: number) => {
-    setIsDeleteImageModalOpen(true)
-  }
+    setSelectedImageIndex(index); // Set the selected image index
+    setIsDeleteImageModalOpen(true); // Open the delete modal
+  };
 
   const confirmDeleteImage = () => {
     if (selectedImageIndex !== null) {

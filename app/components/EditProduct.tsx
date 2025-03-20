@@ -11,6 +11,10 @@ import { Product } from "../types/interfaces";
 import { useProductStore } from "../stores/useProductStore";
 import { ChangeEvent } from 'react'; // Import ChangeEvent from React
 
+import SortableList, { SortableItem } from "react-easy-sort";
+import { arrayMoveImmutable } from "array-move";
+import { Avatar } from "@mui/material";
+
 interface EditProductProps {
   product: Product;
   onClose: () => void;
@@ -109,6 +113,7 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
   };
 
   const openDeleteImageModal = (index: number) => {
+    setSelectedImageIndex(index); // Set the selected image index
     setIsDeleteImageModalOpen(true);
   };
 
@@ -157,6 +162,12 @@ export default function EditProduct({ product , onClose }: EditProductProps) {
       setRatings(value);
     }
   };
+
+  // Add this sorting handler
+  const onSortEnd = (oldIndex: number, newIndex: number) => {
+    const newImages = arrayMoveImmutable(images, oldIndex, newIndex)
+    setImages(newImages)
+  }
 
   const updateProduct = async () => {
     try {

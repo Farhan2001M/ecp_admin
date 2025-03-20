@@ -3,17 +3,38 @@ import { Category } from "../types/interfaces";
 
 interface CategoryStore {
   categories: Category[];
-  refreshTrigger: number; // ✅ NEW: Used to refetch categories
+  refreshTrigger: number;
   fetchCategories: () => Promise<void>;
   triggerRefresh: () => void;
   addCategory: (category: Category) => void;
   updateCategory: (updatedCategory: Category) => void;
   removeCategory: (id: string) => void;
+  startSale: (id: string, saleStartDate: string, saleEndDate: string, salePercentage: number) => void;
 }
 
-export const useCategoryStore = create<CategoryStore>((set ) => ({
+export const useCategoryStore = create<CategoryStore>((set) => ({
   categories: [],
-  refreshTrigger: 0, // ✅ Initial value
+  refreshTrigger: 0,
+
+  startSale: async (id, saleStartDate, saleEndDate, salePercentage) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/categories/${id}/start-sale`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ saleStartDate, saleEndDate, salePercentage }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        set((state) => ({
+          categories: state.categories.map((cat) => (cat._id === id ? data.category : cat)),
+        }));
+      } else {
+        console.error("Error:", data.message);
+      }
+    } catch (error) {
+      console.error("Failed to start sale:", error);
+    }
+  },
 
   fetchCategories: async () => {
     try {
@@ -26,14 +47,14 @@ export const useCategoryStore = create<CategoryStore>((set ) => ({
   },
 
   triggerRefresh: () => {
-    set((state) => ({ refreshTrigger: state.refreshTrigger + 1 })); // ✅ Increment to trigger re-fetch
+    set((state) => ({ refreshTrigger: state.refreshTrigger + 1 }));
   },
 
   addCategory: (category) => {
     set((state) => ({
       categories: [category, ...state.categories],
     }));
-    set((state) => ({ refreshTrigger: state.refreshTrigger + 1 })); // ✅ Ensure UI updates
+    set((state) => ({ refreshTrigger: state.refreshTrigger + 1 }));
   },
 
   updateCategory: (updatedCategory) => {
@@ -42,13 +63,14 @@ export const useCategoryStore = create<CategoryStore>((set ) => ({
         cat._id === updatedCategory._id ? updatedCategory : cat
       ),
     }));
-    set((state) => ({ refreshTrigger: state.refreshTrigger + 1 })); // ✅ Trigger fetch
+    set((state) => ({ refreshTrigger: state.refreshTrigger + 1 }));
   },
 
   removeCategory: (id) => {
     set((state) => ({
       categories: state.categories.filter((category) => category._id !== id),
     }));
-    set((state) => ({ refreshTrigger: state.refreshTrigger + 1 })); // ✅ Ensure UI updates
+    set((state) => ({ refreshTrigger: state.refreshTrigger + 1 }));
   },
+
 }));

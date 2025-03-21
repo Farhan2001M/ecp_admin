@@ -6,7 +6,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { Category } from "../types/interfaces";
 import { RxCrossCircled } from "react-icons/rx";
-
+import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 
 interface SaleModalProps {
   open: boolean;
@@ -23,7 +23,9 @@ const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, category, refreshC
   const [isModified, setIsModified] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showActionConfirmModal, setShowActionConfirmModal] = useState(false);
-  const [actionToConfirm, setActionToConfirm] = useState<"startNow" | "cancelSale" | "endNow" | "updateSale" | null>(null);
+  const [actionToConfirm, setActionToConfirm] = useState<"startNow" | "cancelSale" | "endNow" | "updateSale" | "confirmSale" | null>(null);
+  const isFormValid = startDate !== null && endDate !== null && percentage !== "";
+  const [confirmationMessage, setConfirmationMessage] = useState<string>("");
 
   useEffect(() => {
     if (category) {
@@ -109,15 +111,38 @@ const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, category, refreshC
     }
   };
 
-  const confirmAction = (action: "startNow" | "cancelSale" | "endNow" | "updateSale") => {
+  const confirmAction = (action: "startNow" | "cancelSale" | "endNow" | "updateSale" | "confirmSale") => {
+    let message = "Are you sure? This action cannot be undone."; // Default message
+  
+    switch (action) {
+      case "startNow":
+        message = "Confirming this will start the sale immediately.";
+        break;
+      case "cancelSale":
+        message = "Confirming this would cancel the scheduled sale.";
+        break;
+      case "endNow":
+        message = "Confirming this would end the sale that is currently live.";
+        break;
+      case "updateSale":
+        message = "Confirming this would update the sale details.";
+        break;
+      case "confirmSale":
+        message = "Confirming this will activate the sale with the provided details.";
+        break;
+    }
+  
+    setConfirmationMessage(message);
     setActionToConfirm(action);
     setShowActionConfirmModal(true);
   };
-
+  
   const executeConfirmedAction = () => {
     if (actionToConfirm) {
       if (actionToConfirm === "updateSale") {
         handleSave();
+      } else if (actionToConfirm === "confirmSale") {
+        handleSave(); // Since "confirmSale" is essentially an update action
       } else {
         handleAction(actionToConfirm);
       }
@@ -138,7 +163,7 @@ const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, category, refreshC
             </button>
 
             <Dialog.Title className="text-lg font-semibold text-gray-900 text-center">
-              {`Edit ${category?.saleStatus || "Inactive"} Sale for ${category?.name || "Selected Category"}`}
+             { category?.saleStatus === "Inactive" ? `Offer a Sale for ${category?.name ? `${category?.name} Category` : "Selected Category"}` : `Edit ${category?.saleStatus || "Inactive"} Sale for ${category?.name ? `${category?.name} Category` : "Selected Category"}` }
             </Dialog.Title>
             <div className="mt-4 flex flex-col gap-4">
               <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -149,7 +174,12 @@ const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, category, refreshC
                   className="w-full"
                 />
                 <DateTimePicker 
-                  label="End Date & Time" 
+                  label="End Date & Time"
+                  viewRenderers={{
+                    hours: renderTimeViewClock,
+                    minutes: renderTimeViewClock,
+                    seconds: renderTimeViewClock,
+                  }} 
                   value={endDate} 
                   onChange={(value) => { setEndDate(value); setIsModified(true); }} 
                   className="w-full"
@@ -158,7 +188,22 @@ const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, category, refreshC
               <input
                 type="number"
                 value={percentage}
-                onChange={(e) => { setPercentage(Number(e.target.value)); setIsModified(true); }}
+                onChange={(e) => {
+                  let value = e.target.value;
+                  // Allow empty input when deleting
+                  if (value === "") {
+                    setPercentage("");
+                    setIsModified(true);
+                    return;
+                  }
+                  let numValue = Number(value);
+                  if (!isNaN(numValue) && numValue >= 1 && numValue <= 99) {
+                    setPercentage(numValue);
+                    setIsModified(true);
+                  }
+                }}
+                min={1} // Ensures the UI prevents entering values below 1
+                max={99} // Ensures the UI prevents entering values above 99
                 className="w-full p-3 border rounded-lg"
                 placeholder="Sale Percentage"
               />
@@ -187,8 +232,12 @@ const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, category, refreshC
                 <button onClick={handleClose} className="px-4 py-2 bg-gray-400 text-white rounded-lg">
                   Close
                 </button>
-                <button onClick={() => confirmAction("updateSale")} className="px-4 py-2 bg-green-600 text-white rounded-lg">
-                  {loading ? "Saving..." : (category?.saleStatus === "Active" || category?.saleStatus === "Pending") ? "Update Sale" : "Save"}
+                <button 
+                  onClick={() => confirmAction(category?.saleStatus === "Inactive" ? "confirmSale" : "updateSale")} 
+                  className={`px-4 py-2 rounded-lg ${isFormValid ? "bg-green-600 text-white" : "border-1 border-gray-500 text-gray-500 cursor-not-allowed"}`}
+                  disabled={!isFormValid}
+                >
+                  {loading ? "Saving..." : category?.saleStatus === "Inactive" ? "Confirm Sale" : "Update Sale"}
                 </button>
               </div>
             </div>
@@ -220,9 +269,9 @@ const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, category, refreshC
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
             <Dialog.Title className="text-lg font-semibold text-gray-900 text-center"> Are you sure? </Dialog.Title>
-            <p className="mt-2 text-gray-600">This action cannot be undone.</p>
+            <p className="text-lg text-center mt-2 text-gray-600">{confirmationMessage}</p>
             <div className="mt-6 flex justify-around">
-              <button onClick={executeConfirmedAction} className="px-4 py-2 bg-red-600 text-white rounded-lg" > Delete </button>
+              <button onClick={executeConfirmedAction} className="px-4 py-2 bg-red-600 text-white rounded-lg" > Confirm </button>
               <button onClick={() => setShowActionConfirmModal(false)} className="px-4 py-2 bg-gray-400 text-white rounded-lg" > Cancel </button>
             </div>
           </div>

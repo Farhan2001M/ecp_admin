@@ -3,11 +3,17 @@ import React, { useState } from "react";
 import { useCategoryStore } from "../stores/useCategoryStore";
 import SaleModal from "./SaleModal";
 import { Category } from "../types/interfaces";
+import EditCategory from "./EditCategory";
+import DeleteCategory from "./DeleteCategory";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 
 const CategoryTable: React.FC = () => {
   const { categories, fetchCategories } = useCategoryStore();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
 
   const handleSaleEdit = (category: Category) => {
     setSelectedCategory(category);
@@ -32,6 +38,20 @@ const CategoryTable: React.FC = () => {
 
   return (
     <div className="mt-8 flow-root overflow-hidden">
+
+      {editingCategory && (
+        <EditCategory 
+          category={editingCategory} 
+          onClose={() => setEditingCategory(null)}
+        />
+      )}
+
+      {deletingCategory && (
+        <DeleteCategory 
+          category={deletingCategory} 
+          onClose={() => setDeletingCategory(null)}
+        />
+      )}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <table className="w-full text-left">
           <thead className="bg-gray-200">
@@ -43,6 +63,8 @@ const CategoryTable: React.FC = () => {
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Product Count</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Status</th>
               <th className="px-3 py-3 text-sm font-semibold text-gray-900">Highlighted</th>
+              <th className="px-3 py-3 text-sm font-semibold text-gray-900">Actions</th>
+
             </tr>
           </thead>
           <tbody>
@@ -67,8 +89,29 @@ const CategoryTable: React.FC = () => {
                     {category.highlighted ? "Yes" : "No"}
                   </span>
                 </td>
+                <td className="px-3 py-4 text-sm flex space-x-4">
+                  <button 
+                    onClick={() => setEditingCategory(category)}
+                    className="text-indigo-600 hover:text-indigo-900"
+                  >
+                    <FaEdit className="w-5 h-5" />
+                  </button>
+                  <button 
+                    onClick={() => setDeletingCategory(category)}
+                    className="text-red-600 hover:text-red-900"
+                  >
+                    <MdDelete className="w-5 h-5" />
+                  </button>
+                </td>
               </tr>
             ))}
+            {categories.length === 0 && (
+              <tr>
+                <td colSpan={8} className="text-center py-4 text-gray-500">
+                  No categories found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
 

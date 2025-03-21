@@ -1,54 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
+import { Category } from "../types/interfaces";
 
 interface SaleModalProps {
   open: boolean;
   onClose: () => void;
-  categoryId: string | null; // Pass category ID to update the correct entry
-  refreshCategories: () => void; // Function to refresh the categories after update
+  category: Category | null;
+  refreshCategories: () => void;
 }
 
-const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, categoryId, refreshCategories }) => {
+const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, category, refreshCategories }) => {
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
-  const [percentage, setPercentage] = useState<number | "">(10);
+  const [percentage, setPercentage] = useState<number | "">(0);
   const [loading, setLoading] = useState(false);
 
-  const handleSave = async () => {
-    if (!categoryId) {
-      console.error("No category ID provided!");
-      return;
+  useEffect(() => {
+    if (category) {
+      setStartDate(category.saleStartDate ? dayjs(category.saleStartDate) : null);
+      setEndDate(category.saleEndDate ? dayjs(category.saleEndDate) : null);
+      setPercentage(category.salePercentage || "");
     }
-  
+  }, [category]);
+
+  const resetState = () => {
+    setStartDate(null);
+    setEndDate(null);
+    setPercentage("");
+  };
+
+  const handleAction = async (action: "startNow" | "cancelSale" | "endNow") => {
     setLoading(true);
-  
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/update-sale`, { 
-        method: "PUT", 
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          saleStartDate: startDate ? startDate.toISOString() : null,
-          saleEndDate: endDate ? endDate.toISOString() : null,
-          salePercentage: percentage,
-        }),
+      await fetch(`http://localhost:5000/api/categories/${category?._id}/update-sale`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
       });
-  
-      const data = await response.json();
-      console.log("Response:", data);
-  
-      if (response.ok) {
-        alert("Sale updated successfully!");
-        refreshCategories();
-        onClose();
-      } else {
-        alert(`Failed to update sale: ${data.message}`);
-      }
+
+      refreshCategories();
+      onClose();
+      resetState();
     } catch (error) {
       console.error("Error updating sale:", error);
       alert("An error occurred while updating the sale.");
@@ -56,23 +52,51 @@ const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, categoryId, refres
       setLoading(false);
     }
   };
-  
+
+  const handleSave = async () => {
+    if (!startDate || !endDate || Number(percentage) <= 0) {
+      alert("Start date, end date, and percentage are required.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const body: any = {
+        saleStartDate: startDate.toISOString(),
+        saleEndDate: endDate.toISOString(),
+        salePercentage: percentage,
+      };
+
+      // Add action for both Active and Pending sales
+      if (category?.saleStatus === "Active" || category?.saleStatus === "Pending") {
+        body.action = "updateSale";
+      }
+
+      await fetch(`http://localhost:5000/api/categories/${category?._id}/update-sale`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      refreshCategories();
+      onClose();
+      resetState();
+    } catch (error) {
+      console.error("Error updating sale:", error);
+      alert("An error occurred while updating the sale.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Edit Sale</DialogTitle>
+    <Dialog open={open} onClose={() => { onClose(); resetState(); }}>
+      <DialogTitle>{`Edit ${category?.saleStatus || "Inactive"} Sale for ${category?.name || "Selected category"}`}</DialogTitle>
       <DialogContent>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateTimePicker
-            label="Start Date & Time"
-            value={startDate}
-            onChange={(newValue) => setStartDate(newValue)}
-          />
-          <DateTimePicker
-            label="End Date & Time"
-            value={endDate}
-            onChange={(newValue) => setEndDate(newValue)}
-          />
+          <DateTimePicker label="Start Date & Time" value={startDate} onChange={setStartDate} />
+          <DateTimePicker label="End Date & Time" value={endDate} onChange={setEndDate} />
         </LocalizationProvider>
         <TextField
           label="Sale Percentage"
@@ -83,9 +107,48 @@ const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, categoryId, refres
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={loading}>Cancel</Button>
-        <Button onClick={handleSave} variant="contained" disabled={loading}>
-          {loading ? "Saving..." : "Save"}
+        {category?.saleStatus === "Active" && (
+          <Button 
+            onClick={() => handleAction("endNow")} 
+            color="error" 
+            variant="contained" 
+            style={{ marginRight: "auto" }}
+          >
+            End Sale Now
+          </Button>
+        )}
+        {category?.saleStatus === "Pending" && (
+          <>
+            <Button 
+              onClick={() => handleAction("startNow")} 
+              color="primary" 
+              variant="contained" 
+            >
+              Start Sale Now
+            </Button>
+            <Button 
+              onClick={() => handleAction("cancelSale")} 
+              color="error" 
+              variant="contained" 
+              style={{ marginRight: "auto" }}
+            >
+              Cancel Sale
+            </Button>
+          </>
+        )}
+        <Button 
+          onClick={() => { onClose(); resetState(); }} 
+          disabled={loading} 
+          variant="outlined"
+        >
+          Close
+        </Button>
+        <Button 
+          onClick={handleSave} 
+          variant="contained" 
+          disabled={loading}
+        >
+          {loading ? "Saving..." : (category?.saleStatus === "Active" || category?.saleStatus === "Pending") ? "Update Sale" : "Save"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -93,7 +156,6 @@ const SaleModal: React.FC<SaleModalProps> = ({ open, onClose, categoryId, refres
 };
 
 export default SaleModal;
-
 
 
 
